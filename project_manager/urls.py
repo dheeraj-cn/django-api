@@ -23,7 +23,7 @@ from userapp.models import User
 from userapp.serial import UserSerializer
 from userapp.views import UserHandler, ProjectHandler, UserProjectHandler, MentorProjectHandler, MentorMenteeHandler, \
     get_mentees, get_mentor_projects, get_user_and_mentors_of_project, UserViewSet, ProjectViewSet, UserProjectViewSet, \
-    MentorProjectViewSet, MentorMenteeViewSet
+    MentorProjectViewSet, MentorMenteeViewSet, MenteesView
 from rest_framework.documentation import include_docs_urls
 
 #schema_view = get_swagger_view(title='Swagger Docs')
@@ -33,10 +33,10 @@ from rest_framework.documentation import include_docs_urls
 router = routers.DefaultRouter()
 router.register(r'users',UserViewSet)
 router.register(r'projects',ProjectViewSet)
-router.register(r'userproject',UserProjectViewSet)
-router.register(r'mentorproject',MentorProjectViewSet)
-router.register(r'mentormentee',MentorMenteeViewSet)
-# router.register(r'mentees',MenteesViewSet)
+router.register(r'userprojects',UserProjectViewSet)
+router.register(r'mentorprojects',MentorProjectViewSet)
+router.register(r'mentormentees',MentorMenteeViewSet)
+# router.register(r'mentees',MenteesView)
 
 urlpatterns = [
     url(r'^', include(router.urls)),
@@ -46,7 +46,7 @@ urlpatterns = [
     #path('userproject',UserProjectHandler),
     #path('mentorproject',MentorProjectHandler),
     #path('mentormentee',MentorMenteeHandler),
-    path('mentees',get_mentees),
-    path('mentoring',get_mentor_projects),
-    path('projectmembers',get_user_and_mentors_of_project),
+    # path('mentees',MenteesView.as_view()),
+    # path('mentoring',get_mentor_projects),
+    # path('projectmembers',get_user_and_mentors_of_project),
 ]

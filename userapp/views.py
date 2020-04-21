@@ -4,6 +4,8 @@ from django.core import serializers
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from rest_framework import viewsets
+from rest_framework.decorators import action
+from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from userapp.models import User, Project, UserProject, MentorProject, MentorMentee
@@ -16,9 +18,39 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
+    @action(methods=['get'],detail=True)
+    def mentorProjects(selfself,request,pk=None):
+        all_relation = MentorProject.objects.filter(mentor=pk)
+        lst = MentorProjectSerial(all_relation,many=True)
+        return Response(lst.data)
+
+    @action(methods=['get'],detail=True)
+    def projects(self,request,pk=None):
+        all_relation = UserProject.objects.filter(user=pk)
+        lst = UserProjectSerial(all_relation, many=True)
+        return Response(lst.data)
+
+    @action(methods=['get'],detail=True)
+    def mentees(self,request,pk=None):
+        all_relation = MentorMentee.objects.filter(mentor=pk)
+        lst = MentorMenteeSerial(all_relation,many=True)
+        return Response(lst.data)
+
 class ProjectViewSet(viewsets.ModelViewSet):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
+
+    @action(methods=['get'],detail=True)
+    def users(self,request,pk=None):
+        all_relation = UserProject.objects.filter(project=pk)
+        lst = UserProjectSerial(all_relation, many=True)
+        return Response(lst.data)
+
+    @action(methods=['get'],detail=True)
+    def mentors(self,request,pk=None):
+        all_relation = MentorProject.objects.filter(mentor=pk)
+        lst = MentorProjectSerial(all_relation,many=True)
+        return Response(lst.data)
 
 class UserProjectViewSet(viewsets.ModelViewSet):
     queryset = UserProject.objects.all()
@@ -32,22 +64,17 @@ class MentorMenteeViewSet(viewsets.ModelViewSet):
     queryset = MentorMentee.objects.all()
     serializer_class = MentorMenteeSerial
 
-# class MenteesViewSet(viewsets.ModelViewSet):
-#     queryset = MentorMentee.objects.all()
-#
-#     def retrieve(self, request, *args, **kwargs):
-#         if request.method == 'GET':
-#             return Response("Wrong method", status=400)
-#         elif request.method == 'POST':
-#             data = json.loads(request.body)
-#             mentor_id = data["mentor"]
-#             dt = MentorProject.objects.values_list('project').filter(mentor=mentor_id)
-#             res = []
-#             dictAnswer = {}
-#             for i in dt:
-#                 res += (i)
-#             dictAnswer["Projects"] = res
-#             return Response(dictAnswer, safe=False)
+class MenteesView(APIView):
+    def post(self,request):
+        data = json.loads(request.body)
+        mentor_id = data["mentor"]
+        dt = MentorMentee.objects.values_list('mentee').filter(mentor = mentor_id)
+        res = []
+        dictAnswer = {}
+        for i in dt:
+            res += i
+        dictAnswer["Mentees"] = res
+        return Response(dictAnswer)
 
 @csrf_exempt
 def UserHandler(request):
