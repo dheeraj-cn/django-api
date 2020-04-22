@@ -17,18 +17,11 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework import viewsets, routers
-from rest_framework_swagger.views import get_swagger_view
+from userapp.views import UserViewSet, ProjectViewSet, UserProjectViewSet, \
+    MentorProjectViewSet, MentorMenteeViewSet
 
-from userapp.models import User
-from userapp.serial import UserSerializer
-from userapp.views import UserHandler, ProjectHandler, UserProjectHandler, MentorProjectHandler, MentorMenteeHandler, \
-    get_mentees, get_mentor_projects, get_user_and_mentors_of_project, UserViewSet, ProjectViewSet, UserProjectViewSet, \
-    MentorProjectViewSet, MentorMenteeViewSet, MenteesView
-from rest_framework.documentation import include_docs_urls
-
-#schema_view = get_swagger_view(title='Swagger Docs')
-
-
+from django.views.generic import TemplateView
+from rest_framework.schemas import get_schema_view
 
 router = routers.DefaultRouter()
 router.register(r'users',UserViewSet)
@@ -36,17 +29,18 @@ router.register(r'projects',ProjectViewSet)
 router.register(r'userprojects',UserProjectViewSet)
 router.register(r'mentorprojects',MentorProjectViewSet)
 router.register(r'mentormentees',MentorMenteeViewSet)
-# router.register(r'mentees',MenteesView)
 
 urlpatterns = [
     url(r'^', include(router.urls)),
     path('admin/', admin.site.urls),
-    #path('users',UserHandler),
-    #path('project',ProjectHandler),
-    #path('userproject',UserProjectHandler),
-    #path('mentorproject',MentorProjectHandler),
-    #path('mentormentee',MentorMenteeHandler),
-    # path('mentees',MenteesView.as_view()),
-    # path('mentoring',get_mentor_projects),
-    # path('projectmembers',get_user_and_mentors_of_project),
+    path('swagger-ui/', TemplateView.as_view(
+        template_name='swagger-ui.html',
+        extra_context={'schema_url': 'openapi-schema'}
+    ), name='swagger-ui'),
+    path('openapi', get_schema_view(
+        title="Django Test REST API",
+        description="API for all things …",
+        version="1.0.0",
+        url="http://127.0.0.1:8000"
+    ), name='openapi-schema'),
 ]
